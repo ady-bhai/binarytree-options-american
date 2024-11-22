@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from scipy.stats import norm
 import plotly.graph_objects as go
-from numpy import log, sqrt, exp  # Make sure to import these
+import matplotlib
+matplotlib.use('Agg')  # Set non-interactive backend
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -85,9 +85,9 @@ class AmericanOption:
 
         # Time increment per step
         dt = T / N
-        u = exp(σ * sqrt(dt))  # Up factor
+        u = np.exp(σ * np.sqrt(dt))  # Up factor
         d = 1 / u  # Down factor
-        p = (exp(r * dt) - d) / (u - d)  # Risk-neutral probability
+        p = (np.exp(r * dt) - d) / (u - d)  # Risk-neutral probability
 
         # Initialize asset prices at maturity
         prices = np.zeros(N + 1)
@@ -103,11 +103,11 @@ class AmericanOption:
             for i in range(step + 1):
                 call_values[i] = max(
                     prices[i] - K,  # Early exercise for call
-                    exp(-r * dt) * (p * call_values[i + 1] + (1 - p) * call_values[i])
+                    np.exp(-r * dt) * (p * call_values[i + 1] + (1 - p) * call_values[i])
                 )
                 put_values[i] = max(
                     K - prices[i],  # Early exercise for put
-                    exp(-r * dt) * (p * put_values[i + 1] + (1 - p) * put_values[i])
+                    np.exp(-r * dt) * (p * put_values[i + 1] + (1 - p) * put_values[i])
                 )
                 prices[i] = prices[i] * d
 
@@ -192,4 +192,3 @@ with col1:
     st.pyplot(fig_call)
 with col2:
     st.pyplot(fig_put)
-
